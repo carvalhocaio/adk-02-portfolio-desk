@@ -1,5 +1,5 @@
-import app_name
+import adk_02_portfolio_desk
 
 
 def test_version() -> None:
-    assert app_name.__version__ == "0.1.0"
+    assert adk_02_portfolio_desk.__version__ == "0.1.0"
