@@ -1,4 +1,13 @@
-from .errors import InvalidTradeError, PortfolioError
+from .errors import InsufficientPositionError, InvalidTradeError, PortfolioError
+from .portfolio import Portfolio, Position
 from .trade import Side, Trade
 
-__all__ = ["InvalidTradeError", "PortfolioError", "Side", "Trade"]
+__all__ = [
+    "InsufficientPositionError",
+    "InvalidTradeError",
+    "Portfolio",
+    "PortfolioError",
+    "Position",
+    "Side",
+    "Trade",
+]

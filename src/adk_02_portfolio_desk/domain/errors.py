@@ -4,3 +4,7 @@ class PortfolioError(Exception):
 
 class InvalidTradeError(PortfolioError):
     pass
+
+
+class InsufficientPositionError(PortfolioError):
+    pass
