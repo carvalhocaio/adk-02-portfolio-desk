@@ -1,7 +1,7 @@
 [project]
 name = "adk-02-portfolio-desk"
 version = "0.1.0"
-description = "Starter template for modern Python projects"
+description = "Google ADK conversational portfolio agent with persistent session state"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -59,3 +59,7 @@ line-ending = "auto"
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-q"
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore:\\[EXPERIMENTAL\\] feature .*:UserWarning",
+]
