@@ -7,6 +7,7 @@ from .domain import Portfolio, Position, Side, Trade
 
 PORTFOLIO_KEY = "user:portfolio"
 SCENARIO_KEY = "scenario"
+RECORDED_TRADES_KEY = "temp:recorded_trades"
 
 
 class StateReader(Protocol):
@@ -64,8 +65,15 @@ class PortfolioRecord(_Record):
         )
 
 
-class ScenarioRecord(_Record):
+class TradeLog(_Record):
     trades: tuple[TradeRecord, ...] = ()
+
+    @classmethod
+    def of(cls, trades: tuple[Trade, ...]) -> "TradeLog":
+        return cls(trades=tuple(TradeRecord.of(trade) for trade in trades))
+
+    def to_trades(self) -> tuple[Trade, ...]:
+        return tuple(trade.to_trade() for trade in self.trades)
 
 
 def load_portfolio(state: StateReader) -> Portfolio:
@@ -78,11 +86,25 @@ def save_portfolio(state: StateWriter, portfolio: Portfolio) -> None:
 
 
 def load_scenario(state: StateReader) -> tuple[Trade, ...]:
-    raw = state.get(SCENARIO_KEY)
-    record = ScenarioRecord.model_validate(raw) if raw else ScenarioRecord()
-    return tuple(trade.to_trade() for trade in record.trades)
+    return _load_trades(state, SCENARIO_KEY)
 
 
 def save_scenario(state: StateWriter, trades: tuple[Trade, ...]) -> None:
-    record = ScenarioRecord(trades=tuple(TradeRecord.of(t) for t in trades))
-    state[SCENARIO_KEY] = record.model_dump(mode="json")
+    _save_trades(state, SCENARIO_KEY, trades)
+
+
+def load_recorded_trades(state: StateReader) -> tuple[Trade, ...]:
+    return _load_trades(state, RECORDED_TRADES_KEY)
+
+
+def save_recorded_trades(state: StateWriter, trades: tuple[Trade, ...]) -> None:
+    _save_trades(state, RECORDED_TRADES_KEY, trades)
+
+
+def _load_trades(state: StateReader, key: str) -> tuple[Trade, ...]:
+    raw = state.get(key)
+    return TradeLog.model_validate(raw).to_trades() if raw else ()
+
+
+def _save_trades(state: StateWriter, key: str, trades: tuple[Trade, ...]) -> None:
+    state[key] = TradeLog.of(trades).model_dump(mode="json")

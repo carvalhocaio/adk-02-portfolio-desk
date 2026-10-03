@@ -8,10 +8,13 @@ from pydantic import ValidationError
 from adk_02_portfolio_desk.domain import Portfolio, Side, Trade
 from adk_02_portfolio_desk.state import (
     PORTFOLIO_KEY,
+    RECORDED_TRADES_KEY,
     SCENARIO_KEY,
     load_portfolio,
+    load_recorded_trades,
     load_scenario,
     save_portfolio,
+    save_recorded_trades,
     save_scenario,
 )
 
@@ -33,6 +36,7 @@ def test_missing_keys_load_as_empty() -> None:
 
     assert load_portfolio(state) == Portfolio()
     assert load_scenario(state) == ()
+    assert load_recorded_trades(state) == ()
 
 
 def test_portfolio_round_trips_through_state() -> None:
@@ -79,6 +83,16 @@ def test_scenario_round_trips_through_state() -> None:
 
     assert load_scenario(state) == trades
     assert state[SCENARIO_KEY]["trades"][0]["side"] == "sell"
+
+
+def test_recorded_trades_live_in_temp_scope() -> None:
+    state = empty_state()
+    trades = (Trade("PETR4", Side.BUY, 100, Decimal("38.20")),)
+
+    save_recorded_trades(state, trades)
+
+    assert RECORDED_TRADES_KEY.startswith(State.TEMP_PREFIX)
+    assert load_recorded_trades(state) == trades
 
 
 def test_corrupted_state_fails_loudly() -> None:
