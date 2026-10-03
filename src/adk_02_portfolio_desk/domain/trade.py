@@ -22,6 +22,8 @@ class Trade:
     price: Decimal
 
     def __post_init__(self) -> None:
+        if not isinstance(self.side, Side):
+            raise InvalidTradeError(f"side must be a Side, got {self.side!r}")
         if not TICKER_PATTERN.fullmatch(self.ticker):
             raise InvalidTradeError(f"'{self.ticker}' is not a B3 ticker")
         if self.quantity <= 0:

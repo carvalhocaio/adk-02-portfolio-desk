@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import cast
 
 import pytest
 
@@ -41,3 +42,8 @@ def test_rejects_sub_cent_price() -> None:
 
 def test_accepts_trailing_zeros_beyond_cents() -> None:
     assert Trade("PETR4", Side.BUY, 1, Decimal("38.2000")).price == Decimal("38.2")
+
+
+def test_rejects_a_plain_string_side() -> None:
+    with pytest.raises(InvalidTradeError, match="side must be a Side"):
+        Trade("PETR4", cast(Side, "buy"), 1, Decimal("10"))
